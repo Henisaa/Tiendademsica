@@ -14,6 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 
 @Composable
 fun HomeScreen(storeVM: StoreViewModel, onAddProduct: () -> Unit) {
@@ -65,20 +71,58 @@ fun HomeScreen(storeVM: StoreViewModel, onAddProduct: () -> Unit) {
 
 
             items(storeVM.products) { p ->
+                val imageRes = p.imageUrl?.let {
+                    ctx.resources.getIdentifier(it, "drawable", ctx.packageName)
+                }
+
                 Row(
-                    Modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(p.title, color = Color.White)
-                    TextButton(onClick = { storeVM.addToCart(ctx, p); Toast.makeText(ctx, "Añadido", Toast.LENGTH_SHORT).show() }) {
-                        Text("Agregar", color = Color(0xFF1DB954))
+                    // 1) image
+                    if (imageRes != null && imageRes != 0) {
+                        Image(
+                            painter = painterResource(id = imageRes),
+                            contentDescription = p.title,
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
+                    // 2) text + button
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = p.title,
+                            color = Color.White,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "$${"%.2f".format(p.price)}",
+                            color = Color.Gray
+                        )
+
+                        Spacer(Modifier.height(4.dp))
+
+                        TextButton(
+                            onClick = {
+                                storeVM.addToCart(ctx, p)
+                                Toast.makeText(ctx, "Añadido", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.align(Alignment.End) // or Alignment.Start if you prefer
+                        ) {
+                            Text("Agregar", color = Color(0xFF1DB954), maxLines = 1)
+                        }
                     }
                 }
             }
         }
     }
-
-
 }

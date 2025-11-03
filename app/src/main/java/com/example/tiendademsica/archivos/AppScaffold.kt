@@ -27,6 +27,7 @@ fun AppScaffold(
     storeVM: StoreViewModel,
     onCartClick: () -> Unit,
     onLogout: () -> Unit,
+    onLogin: () -> Unit,
     content: @Composable () -> Unit
 ) {
     Scaffold(
@@ -49,6 +50,10 @@ fun AppScaffold(
                     if (Session.currentUser.value != null) {
                         TextButton(onClick = onLogout) {
                             Text("Cerrar sesión", color = Color.White)
+                        }
+                    } else {
+                        TextButton(onClick = onLogin){
+                            Text("Iniciar Sesion", color = Color.White)
                         }
                     }
                 }

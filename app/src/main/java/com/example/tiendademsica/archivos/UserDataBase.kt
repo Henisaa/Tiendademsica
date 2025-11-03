@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.sqlite.db.SupportSQLiteDatabase
 
+
 @Database(
     entities = [User::class, Product::class, CartItem::class],
     version = 2,
@@ -57,9 +58,19 @@ abstract class UserDatabase : RoomDatabase() {
                         }
                         // 3 productos iniciales
                         if (pdao.count() == 0) {
-                            pdao.insert(Product(title="Álbum: Random Access Memories", category=Category.DISCOS, price=12.99))
-                            pdao.insert(Product(title="Artista: Daft Punk - Merch", category=Category.ARTISTAS, price=25.00))
-                            pdao.insert(Product(title="Vinilo: The Dark Side of the Moon", category=Category.OBJETOS, price=29.90))
+                            pdao.insert(Product
+                                (title="Álbum: Random Access Memories",
+                                category=Category.DISCOS,
+                                price=12.99,
+                                imageUrl = "random_access_memories"))
+                            pdao.insert(Product(title="Artista: Daft Punk - Merch",
+                                category=Category.ARTISTAS,
+                                price=25.00,
+                                imageUrl = "daft_punk_merch"))
+                            pdao.insert(Product(title="Vinilo: The Dark Side of the Moon",
+                                category=Category.OBJETOS,
+                                price=29.90,
+                                imageUrl = "dark_side_moon"))
                         }
                     }
                 }

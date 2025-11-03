@@ -36,10 +36,17 @@ class MainActivity : ComponentActivity() {
                     onLogout = {
                         Session.logout()
                         storeVM.clearCart(ctx)
-                        nav.navigate("login") { popUpTo(0) }
+                        nav.navigate("login") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    },
+                    onLogin = {
+                        nav.navigate("login") {
+                            popUpTo("login") { inclusive = true }
+                        }
                     }
                 ) {
-                    NavHost(navController = nav, startDestination = "login") {
+                    NavHost(navController = nav, startDestination = "home") {
 
                         composable("login") {
                             LoginScreen(
@@ -69,7 +76,11 @@ class MainActivity : ComponentActivity() {
                         composable("add") {
                             AddProductScreen(
                                 storeVM = storeVM,
-                                onBack = { nav.popBackStack() }
+                                onBack = {
+                                    nav.navigate("home") {
+                                        popUpTo("home") { inclusive = false }
+                                    }
+                                }
                             )
                         }
 
@@ -77,7 +88,11 @@ class MainActivity : ComponentActivity() {
                             CartScreen(
                                 storeVM = storeVM,
                                 onCheckout = { nav.navigate("checkout") },
-                                onBack = { nav.popBackStack() }
+                                onBack = {
+                                    nav.navigate("home") {
+                                        popUpTo("home") { inclusive = false }
+                                    }
+                                }
                             )
                         }
 

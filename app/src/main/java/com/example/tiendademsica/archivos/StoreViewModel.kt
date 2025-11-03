@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class StoreViewModel : ViewModel() {
 
@@ -28,18 +29,29 @@ class StoreViewModel : ViewModel() {
 
     fun addProduct(
         ctx: Context,
-        p: Product,
+        product: Product,
         adminPassword: String,
-        onOk: (Boolean) -> Unit
+        onResult: (Boolean) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val u = Session.currentUser.value
-            val ok = (u?.isAdmin == true && u.password == adminPassword)
+            val db = UserDatabase.getDatabase(ctx)
+            val admin = db.userDao().byUsername("admin")
+            val ok = admin != null && admin.password == adminPassword
+
             if (ok) {
-                UserDatabase.getDatabase(ctx).productDao().insert(p)
-                loadProducts(ctx, null)
+                db.productDao().insert(product)
+                val all = db.productDao().all()
+
+                withContext(Dispatchers.Main) {
+                    products.clear()
+                    products.addAll(all)
+                    onResult(true)
+                }
+            } else {
+                withContext(Dispatchers.Main) {
+                    onResult(false)
+                }
             }
-            onOk(ok)
         }
     }
 

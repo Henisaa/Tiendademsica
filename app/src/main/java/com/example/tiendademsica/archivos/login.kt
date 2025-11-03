@@ -79,6 +79,7 @@ fun LoginScreen(
                     scope.launch {
                         val user = dao.login(username, password)
                         if (user != null) {
+                            Session.currentUser.value = user
                             Toast.makeText(context, "Bienvenido ${user.username}", Toast.LENGTH_SHORT).show()
                             onLoginSuccess()
                         } else {
