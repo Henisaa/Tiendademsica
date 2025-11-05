@@ -1,9 +1,7 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 package com.example.tiendademsica.archivos
 import androidx.compose.material3.ExperimentalMaterial3Api
-import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -51,8 +49,6 @@ fun HomeScreen(storeVM: StoreViewModel, onAddProduct: () -> Unit) {
                 FloatingActionButton(
                     onClick = onAddProduct,
                     containerColor = Color(0xFF1DB954)
-                    // Ya no necesitamos .align() ni .padding() aquí,
-                    // el Scaffold lo posiciona automáticamente.
                 ) { Text("+", color = Color.White) }
             }
         }
@@ -95,30 +91,22 @@ fun HomeScreen(storeVM: StoreViewModel, onAddProduct: () -> Unit) {
                     }
 
                     // 2) text + button
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = p.title,
-                            color = Color.White,
-                            maxLines = 1,
-                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = "$${"%.2f".format(p.price)}",
-                            color = Color.Gray
-                        )
-
+                    Column(Modifier.weight(1f)) {
+                        Text(p.title, color = Color.White, maxLines = 1, overflow = Ellipsis)
+                        Text("$${"%.2f".format(p.price)}", color = Color.Gray)
+                        Text("Stock: ${p.stock}", color = if (p.stock > 0) Color.Gray else Color(0xFFFF6B6B))
                         Spacer(Modifier.height(4.dp))
-
                         TextButton(
                             onClick = {
                                 storeVM.addToCart(ctx, p)
                                 Toast.makeText(ctx, "Añadido", Toast.LENGTH_SHORT).show()
                             },
-                            modifier = Modifier.align(Alignment.End) // or Alignment.Start if you prefer
+                            enabled = p.stock > 0,
+                            modifier = Modifier.align(Alignment.End)
                         ) {
-                            Text("Agregar", color = Color(0xFF1DB954), maxLines = 1)
+                            Text(if (p.stock > 0) "Agregar" else "Agotado",
+                                color = if (p.stock > 0) Color(0xFF1DB954) else Color.Gray,
+                                maxLines = 1)
                         }
                     }
                 }

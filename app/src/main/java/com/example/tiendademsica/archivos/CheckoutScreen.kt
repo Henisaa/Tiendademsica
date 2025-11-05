@@ -94,11 +94,12 @@ fun CheckoutScreen(storeVM: StoreViewModel, onDone: () -> Unit) {
                 val expOk = Regex("""^(0[1-9]|1[0-2])\/\d{2}$""").matches(exp)
                 val cvvOk = cvv.length in 3..4 && cvv.all { it.isDigit() }
                 if (name.isBlank() || address.isBlank() || !expOk || !cvvOk || !luhnValid(card)) {
-                    Toast.makeText(ctx, "Revisa los datos de pago", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(ctx, "No se pudo procesar el pago. Revisa la información ingresada.", Toast.LENGTH_SHORT).show()
                 } else {
-                    storeVM.clearCart(ctx)
-                    Toast.makeText(ctx, "Pago exitoso. ¡Gracias!", Toast.LENGTH_LONG).show()
-                    onDone()
+                    storeVM.processCheckout(ctx) { ok, msg ->
+                        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
+                        if (ok) onDone()
+                    }
                 }
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1DB954)),

@@ -38,19 +38,57 @@ class StoreViewModel : ViewModel() {
             val admin = db.userDao().byUsername("admin")
             val ok = admin != null && admin.password == adminPassword
 
-            if (ok) {
-                db.productDao().insert(product)
-                val all = db.productDao().all()
+            if (!ok) {
+                withContext(Dispatchers.Main) { onResult(false) }
+                return@launch
+            }
 
-                withContext(Dispatchers.Main) {
-                    products.clear()
-                    products.addAll(all)
-                    onResult(true)
-                }
+            // Restock if same title exists; else insert new
+            val existing = db.productDao().byTitle(product.title)
+            if (existing != null) {
+                db.productDao().changeStock(existing.id, product.stock)
             } else {
-                withContext(Dispatchers.Main) {
-                    onResult(false)
+                db.productDao().insert(product)
+            }
+
+            val all = db.productDao().all()
+            withContext(Dispatchers.Main) {
+                products.clear()
+                products.addAll(all)
+                onResult(true)
+            }
+        }
+    }
+
+    fun processCheckout(ctx: Context, onResult: (Boolean, String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val db = UserDatabase.getDatabase(ctx)
+            val rows = db.cartDao().allWithProduct()
+
+            for (row in rows) {
+                val prod = db.productDao().byId(row.product.id) ?: continue
+                if (row.item.quantity > prod.stock) {
+                    withContext(Dispatchers.Main) {
+                        onResult(false, "Stock insuficiente para: ${prod.title}")
+                    }
+                    return@launch
                 }
+            }
+
+            for (row in rows) {
+                db.productDao().changeStock(row.product.id, -row.item.quantity)
+            }
+
+            db.cartDao().clear()
+
+            val all = db.productDao().all()
+            withContext(Dispatchers.Main) {
+                products.clear()
+                products.addAll(all)
+                cart.clear()
+                cartCount.value = 0
+                cartTotal.value = 0.0
+                onResult(true, "Pago exitoso")
             }
         }
     }

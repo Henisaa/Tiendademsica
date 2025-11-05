@@ -17,10 +17,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-
-// NOTA: Asegúrate de importar tus clases personalizadas
-// import com.example.tiendademsica.viewmodel.StoreViewModel
-// import com.example.tiendademsica.data.Session
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.example.tiendademsica.R
 
 @Composable
 fun AppScaffold(
@@ -28,12 +29,21 @@ fun AppScaffold(
     onCartClick: () -> Unit,
     onLogout: () -> Unit,
     onLogin: () -> Unit,
+    onAboutClick: () -> Unit,              // before content
     content: @Composable () -> Unit
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Music Store", color = Color.White) },
+                title = {
+                    Image(
+                        painter = painterResource(id = R.drawable.musiclogo),
+                        contentDescription = "Logo",
+                        modifier = Modifier
+                            .height(40.dp)  // adjust as needed
+                            .padding(start = 8.dp)
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black),
                 actions = {
                     // Carrito con badge (siempre)
@@ -45,6 +55,10 @@ fun AppScaffold(
                         TextButton(onClick = onCartClick) {
                             Text("Carrito", color = Color.White)
                         }
+                    }
+
+                    TextButton(onClick = { onAboutClick() }) {
+                        Text("Quiénes Somos", color = Color.White)
                     }
                     // Cerrar sesión (si hay usuario)
                     if (Session.currentUser.value != null) {

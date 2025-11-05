@@ -58,6 +58,21 @@ fun AddProductScreen(storeVM: StoreViewModel, onBack: () -> Unit) {
         )
         Spacer(Modifier.height(8.dp))
 
+        var stockText by remember { mutableStateOf("0") }
+        OutlinedTextField(
+            value = stockText,
+            onValueChange = { stockText = it.filter { ch -> ch.isDigit() } },
+            label = { Text("Stock inicial", color = Color.White) },
+            textStyle = LocalTextStyle.current.copy(color = Color.White),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFF1DB954),
+                unfocusedBorderColor = Color.DarkGray
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(8.dp))
+
+
         // categorías
         Row {
             Category.values().forEach {
@@ -133,6 +148,7 @@ fun AddProductScreen(storeVM: StoreViewModel, onBack: () -> Unit) {
         Button(
             onClick = {
                 val p = price.toDoubleOrNull()
+                val stock = stockText.toIntOrNull() ?: 0   // 👈 added here
                 if (title.isBlank() || p == null || imageName.isBlank()) {
                     Toast.makeText(ctx, "Completa todos los campos, incluida la imagen", Toast.LENGTH_SHORT).show()
                 } else {
@@ -142,7 +158,8 @@ fun AddProductScreen(storeVM: StoreViewModel, onBack: () -> Unit) {
                             title = title,
                             category = category,
                             price = p,
-                            imageUrl = imageName // 👈 this is the key
+                            imageUrl = imageName, // 👈 this is the key
+                            stock = stock          // 👈 added here
                         ),
                         adminPassword = adminPass
                     ) { ok ->
@@ -163,5 +180,5 @@ fun AddProductScreen(storeVM: StoreViewModel, onBack: () -> Unit) {
 
         Spacer(Modifier.height(8.dp))
         TextButton(onClick = onBack) { Text("Volver", color = Color.White) }
+        }
     }
-}

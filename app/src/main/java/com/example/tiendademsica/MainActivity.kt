@@ -18,6 +18,8 @@ import com.example.tiendademsica.archivos.LoginScreen
 import com.example.tiendademsica.archivos.RegisterScreen
 import com.example.tiendademsica.archivos.Session
 import com.example.tiendademsica.archivos.StoreViewModel
+import com.example.tiendademsica.archivos.QuienesSomosScreen
+import com.example.tiendademsica.archivos.SplashScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,9 +46,24 @@ class MainActivity : ComponentActivity() {
                         nav.navigate("login") {
                             popUpTo("login") { inclusive = true }
                         }
+                    },
+                    onAboutClick = {
+                        nav.navigate("about")   // 👈 now wired
                     }
                 ) {
-                    NavHost(navController = nav, startDestination = "home") {
+                    NavHost(navController = nav, startDestination = "splash") {
+
+                        composable("splash") {
+                            SplashScreen(
+                                onFinished = {
+                                    // Decide where to land; you can send to "home" directly
+                                    nav.navigate("home") {
+                                        popUpTo("splash") { inclusive = true }
+                                    }
+                                },
+                                logoResId = R.drawable.musiclogo // put a real drawable name here
+                            )
+                        }
 
                         composable("login") {
                             LoginScreen(
@@ -73,6 +90,12 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+                        composable("about") {
+                            // you said: don’t use popBackStack → use navigate
+                            QuienesSomosScreen(onBack = {
+                                nav.navigate("home") { popUpTo("home") { inclusive = false } }
+                            })
+                        }
                         composable("add") {
                             AddProductScreen(
                                 storeVM = storeVM,
