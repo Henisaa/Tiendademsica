@@ -15,13 +15,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import com.example.tiendademsica.archivos.UserDatabase
-import com.example.tiendademsica.archivos.User
 
 @Composable
 fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
-    onBackToLogin: () -> Unit
+    onBackToLogin: () -> Unit,
+    onBack: () -> Unit
 ) {
     val context = LocalContext.current
     val db = remember { UserDatabase.getDatabase(context) }
@@ -123,6 +122,9 @@ fun RegisterScreen(
 
             TextButton(onClick = { onBackToLogin() }) {
                 Text("¿Ya tienes cuenta? Inicia sesión", color = Color.White)
+            }
+            TextButton(onClick = { onBack() }){
+                Text("Volver", color = Color.White)
             }
         }
     }

@@ -61,12 +61,25 @@ fun CheckoutScreen(storeVM: StoreViewModel, onDone: () -> Unit) {
         Spacer(Modifier.height(8.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedTextField(
-                value = exp, onValueChange = { exp = it },
+                value = exp,
+                onValueChange = { input ->
+                    var cleaned = input.filter { it.isDigit() }
+
+                    // Auto-insert '/' after 2 digits (MM)
+                    if (cleaned.length > 2) {
+                        cleaned = cleaned.substring(0, 2) + "/" + cleaned.substring(2)
+                    }
+
+                    // Limit to MM/YY format
+                    exp = cleaned.take(5)
+                },
                 label = { Text("MM/AA", color = Color.White) },
                 textStyle = LocalTextStyle.current.copy(color = Color.White),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF1DB954), unfocusedBorderColor = Color.DarkGray
-                ), modifier = Modifier.weight(1f)
+                    focusedBorderColor = Color(0xFF1DB954),
+                    unfocusedBorderColor = Color.DarkGray
+                ),
+                modifier = Modifier.weight(1f)
             )
             OutlinedTextField(
                 value = cvv, onValueChange = { cvv = it },

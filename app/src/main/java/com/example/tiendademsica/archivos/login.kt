@@ -19,7 +19,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    onBack: () -> Unit
 ) {
     val context = LocalContext.current
     val db = remember { UserDatabase.getDatabase(context) }
@@ -95,6 +96,10 @@ fun LoginScreen(
 
             TextButton(onClick = { onRegisterClick() }) {
                 Text("¿No tienes cuenta? Regístrate", color = Color.White)
+            }
+            Spacer(Modifier.height(4.dp))
+            TextButton(onClick = { onBack() }){
+                Text("Volver", color = Color.White)
             }
         }
     }

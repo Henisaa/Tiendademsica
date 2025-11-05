@@ -49,6 +49,11 @@ class MainActivity : ComponentActivity() {
                     },
                     onAboutClick = {
                         nav.navigate("about")   // 👈 now wired
+                    },
+                    onLogoClick = {
+                        nav.navigate("home"){
+                            popUpTo("home") { inclusive = true }
+                        }
                     }
                 ) {
                     NavHost(navController = nav, startDestination = "splash") {
@@ -72,14 +77,17 @@ class MainActivity : ComponentActivity() {
                                         popUpTo("login") { inclusive = true }
                                     }
                                 },
-                                onRegisterClick = { nav.navigate("register") }
+                                onRegisterClick = { nav.navigate("register") },
+                                onBack = { nav.navigate("home") {popUpTo("home") { inclusive = false} }
+                                }
                             )
                         }
 
                         composable("register") {
                             RegisterScreen(
                                 onRegisterSuccess = { nav.popBackStack() },
-                                onBackToLogin = { nav.popBackStack() }
+                                onBackToLogin = { nav.navigate("login") },
+                                onBack = {nav.navigate("home")}
                             )
                         }
 

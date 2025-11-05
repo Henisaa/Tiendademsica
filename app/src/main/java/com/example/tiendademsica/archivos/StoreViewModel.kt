@@ -22,8 +22,11 @@ class StoreViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val dao = UserDatabase.getDatabase(ctx).productDao()
             val list = if (category == null) dao.all() else dao.byCategory(category)
-            products.clear()
-            products.addAll(list)
+
+            withContext(Dispatchers.Main) {
+                products.clear()
+                products.addAll(list)
+            }
         }
     }
 
@@ -100,17 +103,26 @@ class StoreViewModel : ViewModel() {
             val count = cdao.totalUnits()
             val total = list.sumOf { it.product.price * it.item.quantity }
 
-            cart.clear()
-            cart.addAll(list)
-            cartCount.value = count
-            cartTotal.value = total
+            withContext(Dispatchers.Main) {
+                cart.clear()
+                cart.addAll(list)
+                cartCount.value = count
+                cartTotal.value = total
+            }
         }
     }
-
     fun addToCart(ctx: Context, product: Product) {
         viewModelScope.launch(Dispatchers.IO) {
             val db = UserDatabase.getDatabase(ctx)
-            db.cartDao().upsert(CartItem(productId = product.id, quantity = 1))
+            val dao = db.cartDao()
+
+            // try to increment existing row
+            val updated = dao.incIfExists(product.id)
+            if (updated == 0) {
+                // no row yet → insert with quantity 1
+                dao.insert(CartItem(productId = product.id, quantity = 1))
+            }
+
             loadCart(ctx)
         }
     }

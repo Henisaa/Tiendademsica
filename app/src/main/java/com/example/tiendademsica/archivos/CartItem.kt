@@ -28,9 +28,15 @@ data class CartItemWithProduct(
 
 @Dao
 interface CartDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(item: CartItem): Long
+    // NEW: try to increment existing row; returns affected rows
+    @Query("UPDATE cart_items SET quantity = quantity + 1 WHERE productId = :pid")
+    suspend fun incIfExists(pid: Int): Int
 
+    // NEW: plain insert (no REPLACE on auto PK)
+    @Insert
+    suspend fun insert(item: CartItem): Long
+
+    // keep the rest
     @Transaction
     @Query("SELECT * FROM cart_items")
     suspend fun allWithProduct(): List<CartItemWithProduct>

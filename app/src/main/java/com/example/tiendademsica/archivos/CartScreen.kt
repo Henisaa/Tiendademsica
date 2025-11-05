@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -22,16 +23,41 @@ fun CartScreen(storeVM: StoreViewModel, onCheckout: () -> Unit, onBack: () -> Un
             Text("No hay productos aún.", color = Color.Gray)
         } else {
             storeVM.cart.forEach { row ->
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(Modifier.weight(1f)) {
                         Text(row.product.title, color = Color.White)
-                        Text("$${"%.2f".format(row.product.price)} x ${row.item.quantity}", color = Color.Gray)
+                        Text(
+                            "$${"%.2f".format(row.product.price)} x ${row.item.quantity}",
+                            color = Color.Gray
+                        )
                     }
-                    Row {
-                        TextButton({ storeVM.dec(ctx, row.product.id) }) { Text("-", color = Color.White) }
-                        Text("${row.item.quantity}", color = Color.White)
-                        TextButton({ storeVM.inc(ctx, row.product.id) }) { Text("+", color = Color.White) }
-                        TextButton({ storeVM.remove(ctx, row.product.id) }) { Text("Quitar", color = Color.White) }
+
+                    Box(
+                        modifier = Modifier.width(IntrinsicSize.Min),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            TextButton(onClick = { storeVM.dec(ctx, row.product.id) }) {
+                                Text("-", color = Color.White)
+                            }
+                            Text("${row.item.quantity}", color = Color.White)
+                            TextButton(onClick = { storeVM.inc(ctx, row.product.id) }) {
+                                Text("+", color = Color.White)
+                            }
+                            TextButton(
+                                onClick = { storeVM.remove(ctx, row.product.id) },
+                                modifier = Modifier.padding(start = 2.dp)
+                            ) {
+                                Text("Quitar", color = Color.White, softWrap = false)
+                            }
+                        }
                     }
                 }
                 Divider(color = Color.DarkGray)
